@@ -1,0 +1,1179 @@
+<!--
+  =====================================================
+    Past Drops Archive Section — shopifycraft.dev
+    Free Shopify section for drop-based stores
+  =====================================================
+    Need this customized for your store?
+    → shopifycraft.dev/hire
+    → hello@shopifycraft.dev
+  =====================================================
+-->
+<style>
+  {{ section.settings.heading_font | font_face: font_display: 'swap' }}
+  {{ section.settings.label_font | font_face: font_display: 'swap' }}
+</style>
+
+{%- liquid
+  assign total_drops  = section.blocks.size
+  assign heading_font_family = section.settings.heading_font.family | append: ', ' | append: section.settings.heading_font.fallback_families
+  assign heading_font_weight = section.settings.heading_font.weight
+  assign heading_font_style  = section.settings.heading_font.style
+  assign label_font_family   = section.settings.label_font.family | append: ', ' | append: section.settings.label_font.fallback_families
+  assign label_font_weight   = section.settings.label_font.weight
+  assign sold_count   = 0
+  assign avail_count  = 0
+  assign upcom_count  = 0
+  assign total_pieces = 0
+  for block in section.blocks
+    case block.settings.status
+      when 'sold'
+        assign sold_count = sold_count | plus: 1
+      when 'available'
+        assign avail_count = avail_count | plus: 1
+      when 'upcoming'
+        assign upcom_count = upcom_count | plus: 1
+    endcase
+    if block.settings.collection != blank
+      assign total_pieces = total_pieces | plus: block.settings.collection.all_products_count
+    endif
+  endfor
+-%}
+
+<style>
+  #shopifycraft-{{ section.id }} {
+    --shopifycraft-heading-font: {{ heading_font_family }};
+    --shopifycraft-heading-weight: {{ heading_font_weight }};
+    --shopifycraft-heading-style: {{ heading_font_style }};
+    --shopifycraft-label-font: {{ label_font_family }};
+    --shopifycraft-label-weight: {{ label_font_weight }};
+    --shopifycraft-sold:     #B91C1C;
+    --shopifycraft-avail:    #15803D;
+    --shopifycraft-upcom:    #B45309;
+    --shopifycraft-sold-bg:  rgba(185,28,28,0.06);
+    --shopifycraft-avail-bg: rgba(21,128,61,0.06);
+    --shopifycraft-upcom-bg: rgba(180,83,9,0.06);
+    --shopifycraft-sold-bd:  rgba(185,28,28,0.18);
+    --shopifycraft-avail-bd: rgba(21,128,61,0.18);
+    --shopifycraft-upcom-bd: rgba(180,83,9,0.18);
+    --shopifycraft-ease:     cubic-bezier(.4,0,.2,1);
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    #shopifycraft-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  #shopifycraft-{{ section.id }} .shopifycraft-inner {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 2.8rem;
+  }
+
+  /* header */
+  #shopifycraft-{{ section.id }} .shopifycraft-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 4rem;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-label {
+    font-family: var(--shopifycraft-label-font);
+    font-weight: var(--shopifycraft-label-weight);
+    font-size: 1rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: rgba(var(--color-foreground), .4);
+    margin-bottom: 1rem;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-title {
+    font-family: var(--shopifycraft-heading-font);
+    font-weight: var(--shopifycraft-heading-weight);
+    font-style: var(--shopifycraft-heading-style);
+    font-size: clamp(5.2rem, 7vw, 8.2rem);
+    line-height: .92;
+    letter-spacing: -.01em;
+    margin: 0;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-sub {
+    font-size: 1.1rem;
+    letter-spacing: .05em;
+    color: rgba(var(--color-foreground), .5);
+    margin-top: 1rem;
+    font-style: italic;
+  }
+
+  /* stats */
+  #shopifycraft-{{ section.id }} .shopifycraft-stats {
+    display: flex;
+    gap: 2.4rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-stat-n {
+    display: block;
+    font-family: var(--shopifycraft-heading-font);
+    font-weight: var(--shopifycraft-heading-weight);
+    font-size: 3.8rem;
+    line-height: 1;
+    letter-spacing: -.01em;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-stat-l {
+    display: block;
+    font-size: .9rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: rgba(var(--color-foreground), .4);
+    margin-top: .4rem;
+  }
+
+  /* controls */
+  #shopifycraft-{{ section.id }} .shopifycraft-controls {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: .1rem solid rgba(var(--color-foreground), .1);
+    margin-bottom: 1.6rem;
+    flex-wrap: wrap;
+    gap: .8rem;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-filters { display: flex; flex-wrap: wrap; }
+  #shopifycraft-{{ section.id }} .shopifycraft-fb {
+    font-size: 1rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    color: rgba(var(--color-foreground), .5);
+    padding: 1rem 1.6rem;
+    cursor: pointer;
+    border-bottom: .2rem solid transparent;
+    margin-bottom: -.1rem;
+    transition: color .2s var(--shopifycraft-ease), border-color .2s var(--shopifycraft-ease);
+    white-space: nowrap;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-fb:hover { color: rgb(var(--color-foreground)); }
+  #shopifycraft-{{ section.id }} .shopifycraft-fb.is-active {
+    color: rgb(var(--color-foreground));
+    border-bottom-color: rgb(var(--color-foreground));
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-fc {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(var(--color-foreground), .05);
+    border: .1rem solid rgba(var(--color-foreground), .1);
+    border-radius: .2rem;
+    font-size: .8rem;
+    padding: .1rem .4rem;
+    margin-left: .4rem;
+    color: rgba(var(--color-foreground), .4);
+    vertical-align: middle;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-fb.is-active .shopifycraft-fc { color: rgba(var(--color-foreground), .6); }
+
+  /* layout toggle */
+  #shopifycraft-{{ section.id }} .shopifycraft-layout-toggle {
+    display: flex;
+    gap: .3rem;
+    padding-bottom: .8rem;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-lb {
+    background: none;
+    border: .1rem solid rgba(var(--color-foreground), .15);
+    border-radius: .3rem;
+    color: rgba(var(--color-foreground), .35);
+    cursor: pointer;
+    padding: .5rem 1rem;
+    transition: all .2s var(--shopifycraft-ease);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .9rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-lb:hover {
+    border-color: rgba(var(--color-foreground), .3);
+    color: rgba(var(--color-foreground), .6);
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-lb.is-active {
+    background: rgb(var(--color-foreground));
+    border-color: rgb(var(--color-foreground));
+    color: rgb(var(--color-background));
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-lb svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: currentColor;
+  }
+
+  /* results */
+  #shopifycraft-{{ section.id }} .shopifycraft-results {
+    font-size: 1rem;
+    letter-spacing: .1em;
+    color: rgba(var(--color-foreground), .35);
+    text-transform: uppercase;
+    margin-bottom: 3.6rem;
+    min-height: 1.4rem;
+  }
+
+  /* year group */
+  #shopifycraft-{{ section.id }} .shopifycraft-year-group { margin-bottom: 5.2rem; }
+  #shopifycraft-{{ section.id }} .shopifycraft-year-divider {
+    display: flex;
+    align-items: center;
+    gap: 1.6rem;
+    margin-bottom: 2.4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-yr-rule {
+    flex: 1;
+    height: .1rem;
+    background: rgba(var(--color-foreground), .1);
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-yr-label {
+    font-style: italic;
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: rgba(var(--color-foreground), .35);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-yr-bg {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 700;
+    font-size: 9.6rem;
+    line-height: 1;
+    letter-spacing: -.02em;
+    color: transparent;
+    -webkit-text-stroke: .1rem rgba(var(--color-foreground), .06);
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+  }
+
+  /* timeline */
+  #shopifycraft-{{ section.id }} .shopifycraft-timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-timeline::before {
+    content: '';
+    position: absolute;
+    left: 2rem;
+    top: 1.6rem;
+    bottom: 1.6rem;
+    width: .1rem;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(var(--color-foreground), .12) 8%,
+      rgba(var(--color-foreground), .12) 92%,
+      transparent
+    );
+  }
+
+  /* card */
+  #shopifycraft-{{ section.id }} .shopifycraft-card {
+    display: grid;
+    grid-template-columns: 4.4rem 1fr;
+    gap: 0 2rem;
+    padding: 2rem 0;
+    border-top: .1rem solid rgba(var(--color-foreground), .1);
+    animation: pdFadeUp .3s var(--shopifycraft-ease) both;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-card:last-child {
+    border-bottom: .1rem solid rgba(var(--color-foreground), .1);
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-card[data-hidden] { display: none; }
+
+  @keyframes pdFadeUp {
+    from { opacity: 0; transform: translateY(.8rem); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* dot */
+  #shopifycraft-{{ section.id }} .shopifycraft-tl-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: .4rem;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-dot {
+    width: .8rem;
+    height: .8rem;
+    border-radius: 50%;
+    border: .15rem solid rgba(var(--color-foreground), .25);
+    background: rgb(var(--color-background));
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    transition: border-color .2s var(--shopifycraft-ease);
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-card:hover .shopifycraft-dot { border-color: rgba(var(--color-foreground), .5); }
+  #shopifycraft-{{ section.id }} .shopifycraft-dot--sold  { border-color: var(--shopifycraft-sold);  background: var(--shopifycraft-sold-bg); }
+  #shopifycraft-{{ section.id }} .shopifycraft-dot--available { border-color: var(--shopifycraft-avail); background: var(--shopifycraft-avail-bg); }
+  #shopifycraft-{{ section.id }} .shopifycraft-dot--upcoming {
+    border-color: var(--shopifycraft-upcom);
+    background: var(--shopifycraft-upcom-bg);
+    animation: pdDotPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pdDotPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(180,83,9,.3); }
+    50%      { box-shadow: 0 0 0 .6rem rgba(180,83,9,0); }
+  }
+
+  /* card body */
+  #shopifycraft-{{ section.id }} .shopifycraft-body { min-width: 0; }
+  #shopifycraft-{{ section.id }} .shopifycraft-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .8rem;
+    margin-bottom: .7rem;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-num {
+    font-size: .95rem;
+    letter-spacing: .14em;
+    color: rgba(var(--color-foreground), .5);
+    text-transform: uppercase;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-date {
+    font-size: .95rem;
+    letter-spacing: .1em;
+    color: rgba(var(--color-foreground), .35);
+    text-transform: uppercase;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-date::before {
+    content: '·';
+    margin-right: 1rem;
+    color: rgba(var(--color-foreground), .25);
+  }
+
+  /* badge */
+  #shopifycraft-{{ section.id }} .shopifycraft-badge {
+    font-family: var(--shopifycraft-label-font);
+    font-weight: var(--shopifycraft-label-weight);
+    font-size: .8rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    padding: .2rem .7rem;
+    border-radius: .2rem;
+    white-space: nowrap;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-badge--sold  { color: #B91C1C !important; background: rgba(185,28,28,0.06);  border: .1rem solid rgba(185,28,28,0.18); }
+  #shopifycraft-{{ section.id }} .shopifycraft-badge--available { color: #15803D !important; background: rgba(21,128,61,0.06);  border: .1rem solid rgba(21,128,61,0.18); }
+  #shopifycraft-{{ section.id }} .shopifycraft-badge--upcoming  { color: #B45309 !important; background: rgba(180,83,9,0.06);   border: .1rem solid rgba(180,83,9,0.18); }
+
+  /* drop name */
+  #shopifycraft-{{ section.id }} .shopifycraft-name {
+    font-family: var(--shopifycraft-heading-font);
+    font-weight: var(--shopifycraft-heading-weight);
+    font-style: var(--shopifycraft-heading-style);
+    font-size: clamp(2.4rem, 3vw, 3.6rem);
+    letter-spacing: -.01em;
+    line-height: 1;
+    margin: 0 0 1.2rem;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-card--sold .shopifycraft-name { color: rgba(var(--color-foreground), .5); }
+
+  /* countdown */
+  #shopifycraft-{{ section.id }} .shopifycraft-countdown {
+    display: flex;
+    gap: .4rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-cd-label {
+    font-size: .9rem;
+    letter-spacing: .14em;
+    color: rgba(var(--color-foreground), .5);
+    text-transform: uppercase;
+    margin-right: .6rem;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-cd-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .2rem;
+    background: rgba(var(--color-foreground), .04);
+    border: .1rem solid rgba(var(--color-foreground), .1);
+    border-radius: .3rem;
+    padding: .4rem .8rem;
+    min-width: 4rem;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-cd-val {
+    font-family: var(--shopifycraft-heading-font);
+    font-weight: var(--shopifycraft-heading-weight);
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--shopifycraft-upcom);
+    letter-spacing: .01em;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-cd-lbl {
+    font-size: .7rem;
+    letter-spacing: .12em;
+    color: rgba(var(--color-foreground), .35);
+    text-transform: uppercase;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-cd-sep {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: rgba(var(--color-foreground), .25);
+    align-self: flex-start;
+    padding-top: .3rem;
+  }
+
+  /* thumbnails */
+  #shopifycraft-{{ section.id }} .shopifycraft-thumbs {
+    display: flex;
+    gap: .6rem;
+    margin-bottom: 1.2rem;
+    overflow-x: auto;
+    padding-bottom: .2rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-thumbs::-webkit-scrollbar { display: none; }
+  #shopifycraft-{{ section.id }} .shopifycraft-thumb {
+    flex-shrink: 0;
+    width: 6.6rem;
+    height: 8.4rem;
+    border-radius: .4rem;
+    border: .1rem solid rgba(var(--color-foreground), .1);
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s var(--shopifycraft-ease), border-color .2s var(--shopifycraft-ease), box-shadow .2s var(--shopifycraft-ease);
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-thumb:hover {
+    transform: translateY(-.2rem);
+    border-color: rgba(var(--color-foreground), .25);
+    box-shadow: 0 .4rem 1.2rem rgba(0,0,0,.08);
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-thumb img,
+  #shopifycraft-{{ section.id }} .shopifycraft-thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: rgba(var(--color-foreground), .06);
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-thumb-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.4rem .4rem .4rem;
+    background: linear-gradient(to top, rgba(0,0,0,.45), transparent);
+    font-size: .7rem;
+    letter-spacing: .04em;
+    color: rgba(255,255,255,.75);
+    text-align: center;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-card--sold .shopifycraft-thumb { opacity: .5; filter: grayscale(.4); }
+  #shopifycraft-{{ section.id }} .shopifycraft-card--sold .shopifycraft-thumb:hover { opacity: .7; }
+  #shopifycraft-{{ section.id }} .shopifycraft-sold-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .7rem;
+    letter-spacing: .08em;
+    color: rgba(255,255,255,.75);
+    text-transform: uppercase;
+  }
+
+  /* card footer */
+  #shopifycraft-{{ section.id }} .shopifycraft-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .8rem;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-pieces {
+    font-size: .95rem;
+    letter-spacing: .1em;
+    color: rgba(var(--color-foreground), .35);
+    text-transform: uppercase;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-actions { display: flex; gap: .6rem; align-items: center; margin-left: auto; }
+
+  /* buttons */
+  #shopifycraft-{{ section.id }} .shopifycraft-btn {
+    font-family: var(--shopifycraft-label-font);
+    font-weight: var(--shopifycraft-label-weight);
+    font-size: .9rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    border-radius: .3rem;
+    padding: .6rem 1.2rem;
+    cursor: pointer;
+    transition: all .2s var(--shopifycraft-ease);
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-btn--ghost {
+    background: none;
+    border: .1rem solid rgba(var(--color-foreground), .2);
+    color: rgba(var(--color-foreground), .55);
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-btn--ghost:hover {
+    border-color: rgba(var(--color-foreground), .45);
+    color: rgb(var(--color-foreground));
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-btn--notify {
+    background: rgba(180,83,9,0.06);
+    border: .1rem solid rgba(180,83,9,0.18);
+    color: #B45309 !important;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-btn--primary {
+    background: rgb(var(--color-foreground));
+    border: .1rem solid rgb(var(--color-foreground));
+    color: rgb(var(--color-background));
+    font-weight: 500;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-btn--primary:hover { opacity: .88; }
+
+  /* grid mode */
+  #shopifycraft-{{ section.id }}.is-grid .shopifycraft-timeline::before { display: none; }
+  #shopifycraft-{{ section.id }}.is-grid .shopifycraft-timeline {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr));
+    gap: .1rem;
+    background: rgba(var(--color-foreground), .1);
+    border: .1rem solid rgba(var(--color-foreground), .1);
+    border-radius: .4rem;
+    overflow: hidden;
+    flex-direction: unset;
+  }
+  #shopifycraft-{{ section.id }}.is-grid .shopifycraft-card {
+    display: flex;
+    flex-direction: column;
+    background: rgb(var(--color-background));
+    padding: 2rem;
+    border-top: none;
+    border-bottom: none;
+    transition: background .2s var(--shopifycraft-ease);
+  }
+  #shopifycraft-{{ section.id }}.is-grid .shopifycraft-card:hover { background: rgba(var(--color-foreground), .02); }
+  #shopifycraft-{{ section.id }}.is-grid .shopifycraft-card:last-child { border-bottom: none; }
+  #shopifycraft-{{ section.id }}.is-grid .shopifycraft-tl-col { display: none; }
+  #shopifycraft-{{ section.id }}.is-grid .shopifycraft-body { width: 100%; }
+  #shopifycraft-{{ section.id }}.is-grid .shopifycraft-name { font-size: clamp(2rem, 2.4vw, 2.6rem); margin-bottom: 1rem; }
+
+  /* empty */
+  #shopifycraft-{{ section.id }} .shopifycraft-empty { text-align: center; padding: 6.4rem 2.8rem; display: none; }
+  #shopifycraft-{{ section.id }} .shopifycraft-empty.is-visible { display: block; }
+  #shopifycraft-{{ section.id }} .shopifycraft-empty-title {
+    font-size: 4.8rem;
+    font-weight: 700;
+    color: rgba(var(--color-foreground), .25);
+    font-style: italic;
+    margin-bottom: .8rem;
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-empty-sub {
+    font-size: 1rem;
+    letter-spacing: .12em;
+    color: rgba(var(--color-foreground), .3);
+    text-transform: uppercase;
+  }
+
+  /* section footer */
+  #shopifycraft-{{ section.id }} .shopifycraft-section-foot {
+    margin-top: 4.8rem;
+    padding-top: 2.4rem;
+    border-top: .1rem solid rgba(var(--color-foreground), .1);
+  }
+  #shopifycraft-{{ section.id }} .shopifycraft-foot-note {
+    font-size: .95rem;
+    letter-spacing: .08em;
+    color: rgba(var(--color-foreground), .35);
+    text-transform: uppercase;
+    font-style: italic;
+  }
+
+  /* responsive */
+  @media screen and (max-width: 749px) {
+    #shopifycraft-{{ section.id }} .shopifycraft-inner { padding: 0 1.6rem; }
+    #shopifycraft-{{ section.id }} .shopifycraft-head { flex-direction: column; align-items: flex-start; }
+    #shopifycraft-{{ section.id }} .shopifycraft-controls { flex-direction: column; align-items: flex-start; gap: 1rem; border-bottom: none; }
+    #shopifycraft-{{ section.id }} .shopifycraft-filters { border-bottom: .1rem solid rgba(var(--color-foreground), .1); width: 100%; }
+    #shopifycraft-{{ section.id }} .shopifycraft-timeline::before { left: 1.7rem; }
+    #shopifycraft-{{ section.id }}.is-grid .shopifycraft-timeline { grid-template-columns: 1fr 1fr; }
+  }
+  @media screen and (max-width: 380px) {
+    #shopifycraft-{{ section.id }}.is-grid .shopifycraft-timeline { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div
+  id="shopifycraft-{{ section.id }}"
+  class="color-{{ section.settings.color_scheme }}{% if section.settings.default_layout == 'grid' %} is-grid{% endif %}"
+>
+  <div class="shopifycraft-inner">
+
+    {%- comment -%} ── Header ── {%- endcomment -%}
+    <div class="shopifycraft-head">
+      <div>
+        {%- if section.settings.label != blank -%}
+          <p class="shopifycraft-label">{{ section.settings.label }}</p>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h1 class="shopifycraft-title">{{ section.settings.heading }}</h1>
+        {%- endif -%}
+        {%- if section.settings.subheading != blank -%}
+          <p class="shopifycraft-sub">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.show_stats and total_drops > 0 -%}
+        <div class="shopifycraft-stats">
+          <div>
+            <span class="shopifycraft-stat-n">{{ total_drops | prepend: '0' | slice: -2, 2 }}</span>
+            <span class="shopifycraft-stat-l">Total Drops</span>
+          </div>
+          {%- if total_pieces > 0 -%}
+            <div>
+              <span class="shopifycraft-stat-n">{{ total_pieces | prepend: '0' | slice: -2, 2 }}</span>
+              <span class="shopifycraft-stat-l">Total Pieces</span>
+            </div>
+          {%- endif -%}
+          {%- if sold_count > 0 -%}
+            <div>
+              <span class="shopifycraft-stat-n">{{ sold_count | prepend: '0' | slice: -2, 2 }}</span>
+              <span class="shopifycraft-stat-l">Sold Out</span>
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ── Controls ── {%- endcomment -%}
+    <div class="shopifycraft-controls">
+      {%- if section.settings.show_filter -%}
+        <div class="shopifycraft-filters" id="shopifycraft-filters-{{ section.id }}">
+          <button class="shopifycraft-fb is-active" data-filter="all">
+            All <span class="shopifycraft-fc">{{ total_drops }}</span>
+          </button>
+          {%- if sold_count > 0 -%}
+            <button class="shopifycraft-fb" data-filter="sold">
+              Sold Out <span class="shopifycraft-fc">{{ sold_count }}</span>
+            </button>
+          {%- endif -%}
+          {%- if avail_count > 0 -%}
+            <button class="shopifycraft-fb" data-filter="available">
+              Available <span class="shopifycraft-fc">{{ avail_count }}</span>
+            </button>
+          {%- endif -%}
+          {%- if upcom_count > 0 -%}
+            <button class="shopifycraft-fb" data-filter="upcoming">
+              Upcoming <span class="shopifycraft-fc">{{ upcom_count }}</span>
+            </button>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.show_layout_toggle -%}
+        <div class="shopifycraft-layout-toggle" id="shopifycraft-layout-{{ section.id }}">
+          <button class="shopifycraft-lb{% if section.settings.default_layout == 'timeline' %} is-active{% endif %}" data-layout="timeline">
+            <svg viewBox="0 0 12 12" aria-hidden="true">
+              <circle cx="1.5" cy="1" r="1"/><rect x="3.5" y=".25" width="8.5" height="1.5" rx=".5"/>
+              <circle cx="1.5" cy="6" r="1"/><rect x="3.5" y="5.25" width="8.5" height="1.5" rx=".5"/>
+              <circle cx="1.5" cy="11" r="1"/><rect x="3.5" y="10.25" width="8.5" height="1.5" rx=".5"/>
+            </svg>
+            Timeline
+          </button>
+          <button class="shopifycraft-lb{% if section.settings.default_layout == 'grid' %} is-active{% endif %}" data-layout="grid">
+            <svg viewBox="0 0 12 12" aria-hidden="true">
+              <rect x="0" y="0" width="5.3" height="5.3" rx=".5"/><rect x="6.7" y="0" width="5.3" height="5.3" rx=".5"/>
+              <rect x="0" y="6.7" width="5.3" height="5.3" rx=".5"/><rect x="6.7" y="6.7" width="5.3" height="5.3" rx=".5"/>
+            </svg>
+            Grid
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <p class="shopifycraft-results" id="shopifycraft-results-{{ section.id }}"></p>
+
+    {%- comment -%} ── Drop cards grouped by year ── {%- endcomment -%}
+    <div id="shopifycraft-drops-{{ section.id }}">
+      {%- if section.blocks.size > 0 -%}
+
+        {%- assign years_seen = '' -%}
+        {%- for block in section.blocks -%}
+          {%- assign yr = block.settings.release_date | date: '%Y' -%}
+          {%- if yr == blank -%}{%- assign yr = '9999' -%}{%- endif -%}
+          {%- unless years_seen contains yr -%}
+            {%- assign years_seen = years_seen | append: yr | append: ',' -%}
+          {%- endunless -%}
+        {%- endfor -%}
+        {%- assign year_list = years_seen | split: ',' | reverse -%}
+
+        {%- for year in year_list -%}
+          {%- if year == '' -%}{%- continue -%}{%- endif -%}
+
+          <div class="shopifycraft-year-group">
+            <div class="shopifycraft-year-divider">
+              <div class="shopifycraft-yr-rule"></div>
+              {%- if year == '9999' -%}
+                <span class="shopifycraft-yr-label">Coming Soon</span>
+              {%- else -%}
+                <span class="shopifycraft-yr-label">{{ year }}</span>
+              {%- endif -%}
+              <div class="shopifycraft-yr-rule"></div>
+              <span class="shopifycraft-yr-bg" aria-hidden="true">{% if year == '9999' %}—{% else %}{{ year }}{% endif %}</span>
+            </div>
+
+            <div class="shopifycraft-timeline">
+              {%- for block in section.blocks -%}
+                {%- assign block_year = block.settings.release_date | date: '%Y' -%}
+                {%- if block_year == blank -%}{%- assign block_year = '9999' -%}{%- endif -%}
+                {%- unless block_year == year -%}{%- continue -%}{%- endunless -%}
+
+                {%- liquid
+                  assign status     = block.settings.status
+                  assign collection = block.settings.collection
+                  assign drop_url   = block.settings.cta_url
+                  if drop_url == blank and collection != blank
+                    assign drop_url = collection.url
+                  endif
+                -%}
+
+                <div
+                  class="shopifycraft-card shopifycraft-card--{{ status }}"
+                  data-status="{{ status }}"
+                  style="animation-delay: {{ forloop.index0 | times: 0.055 }}s"
+                  {{ block.shopify_attributes }}
+                >
+                  <div class="shopifycraft-tl-col">
+                    <div class="shopifycraft-dot shopifycraft-dot--{{ status }}"></div>
+                  </div>
+
+                  <div class="shopifycraft-body">
+                    <div class="shopifycraft-card-head">
+                      <div class="shopifycraft-card-meta">
+                        {%- if block.settings.drop_number != blank -%}
+                          <span class="shopifycraft-num">{{ block.settings.drop_number }}</span>
+                        {%- endif -%}
+                        {%- if block.settings.release_date != blank -%}
+                          <span class="shopifycraft-date">{{ block.settings.release_date | date: '%b %d, %Y' }}</span>
+                        {%- endif -%}
+                      </div>
+                      <span class="shopifycraft-badge shopifycraft-badge--{{ status }}">
+                        {%- if status == 'sold' -%}Sold Out
+                        {%- elsif status == 'available' -%}Available
+                        {%- else -%}Upcoming
+                        {%- endif -%}
+                      </span>
+                    </div>
+
+                    {%- if block.settings.drop_name != blank -%}
+                      <h3 class="shopifycraft-name">{{ block.settings.drop_name }}</h3>
+                    {%- endif -%}
+
+                    {%- if status == 'upcoming' and block.settings.release_date != blank -%}
+                      <div class="shopifycraft-countdown" data-countdown="{{ block.settings.release_date }}">
+                        <span class="shopifycraft-cd-label">Loading…</span>
+                      </div>
+                    {%- endif -%}
+
+                    {%- if collection != blank and collection.products.size > 0 -%}
+                      <div class="shopifycraft-thumbs">
+                        {%- for product in collection.products limit: 5 -%}
+                          <div class="shopifycraft-thumb">
+                            {%- if product.featured_image -%}
+                              <img
+                                src="{{ product.featured_image | image_url: width: 132 }}"
+                                alt="{{ product.title | escape }}"
+                                width="66"
+                                height="84"
+                                loading="lazy"
+                              >
+                            {%- else -%}
+                              <div class="shopifycraft-thumb-placeholder"></div>
+                            {%- endif -%}
+                            {%- if status == 'sold' -%}
+                              <div class="shopifycraft-sold-overlay">Sold Out</div>
+                            {%- endif -%}
+                            <div class="shopifycraft-thumb-label">{{ product.title | truncate: 12, '' }}</div>
+                          </div>
+                        {%- endfor -%}
+                      </div>
+                    {%- endif -%}
+
+                    <div class="shopifycraft-foot">
+                      {%- if collection != blank and collection.all_products_count > 0 -%}
+                        <span class="shopifycraft-pieces">{{ collection.all_products_count | prepend: '0' | slice: -2, 2 }} pieces</span>
+                      {%- endif -%}
+                      <div class="shopifycraft-actions">
+                        <!-- shopifycraft-debug: status={{ status }} -->
+                        {%- if status == 'sold' -%}
+                          {%- if drop_url != blank -%}
+                            <a href="{{ drop_url }}" class="shopifycraft-btn shopifycraft-btn--ghost">View Archive →</a>
+                          {%- else -%}
+                            <span class="shopifycraft-btn shopifycraft-btn--ghost">Sold Out</span>
+                          {%- endif -%}
+                        {%- elsif status == 'available' -%}
+                          {%- if drop_url != blank -%}
+                            <a href="{{ drop_url }}" class="shopifycraft-btn shopifycraft-btn--ghost">View Drop →</a>
+                            <a href="{{ drop_url }}" class="shopifycraft-btn shopifycraft-btn--primary">Shop Now</a>
+                          {%- endif -%}
+                        {%- else -%}
+                          {%- if block.settings.notify_url != blank -%}
+                            <a href="{{ block.settings.notify_url }}" class="shopifycraft-btn shopifycraft-btn--notify">Notify Me</a>
+                          {%- else -%}
+                            <a href="#" class="shopifycraft-btn shopifycraft-btn--notify">Notify Me</a>
+                          {%- endif -%}
+                        {%- endif -%}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              {%- endfor -%}
+            </div>
+          </div>
+
+        {%- endfor -%}
+
+      {%- else -%}
+        <div class="shopifycraft-empty is-visible">
+          <p class="shopifycraft-empty-title">No drops yet</p>
+          <p class="shopifycraft-empty-sub">Add drops using the Theme Editor</p>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="shopifycraft-empty" id="shopifycraft-empty-{{ section.id }}">
+      <p class="shopifycraft-empty-title">No drops</p>
+      <p class="shopifycraft-empty-sub">No drops match this filter</p>
+    </div>
+
+    {%- if section.settings.footer_note != blank -%}
+      <div class="shopifycraft-section-foot">
+        <span class="shopifycraft-foot-note">{{ section.settings.footer_note }}</span>
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+<script>
+(function() {
+  var root    = document.getElementById('shopifycraft-{{ section.id }}');
+  var filters = document.getElementById('shopifycraft-filters-{{ section.id }}');
+  var layouts = document.getElementById('shopifycraft-layout-{{ section.id }}');
+  var results = document.getElementById('shopifycraft-results-{{ section.id }}');
+  var empty   = document.getElementById('shopifycraft-empty-{{ section.id }}');
+
+  if (!root) return;
+
+  var activeFilter = 'all';
+  var timers = [];
+
+  function getCards() {
+    return root.querySelectorAll('.shopifycraft-card');
+  }
+
+  function applyFilter() {
+    var cards = getCards();
+    var visible = 0;
+
+    cards.forEach(function(card, i) {
+      var show = activeFilter === 'all' || card.dataset.status === activeFilter;
+      if (show) {
+        card.removeAttribute('data-hidden');
+        card.style.animationDelay = (visible * 0.055) + 's';
+        visible++;
+      } else {
+        card.setAttribute('data-hidden', '');
+      }
+    });
+
+    if (results) {
+      results.textContent = visible
+        ? 'Showing ' + visible + ' drop' + (visible !== 1 ? 's' : '')
+        : '';
+    }
+    if (empty) empty.classList.toggle('is-visible', visible === 0);
+  }
+
+  function tick(el, target) {
+    var ms = target - Date.now();
+    if (ms <= 0) {
+      el.innerHTML = '<span class="shopifycraft-cd-label">Live now</span>';
+      return;
+    }
+    var d = Math.floor(ms / 86400000);
+    var h = Math.floor((ms % 86400000) / 3600000);
+    var m = Math.floor((ms % 3600000) / 60000);
+    var s = Math.floor((ms % 60000) / 1000);
+    function u(v, l) {
+      return '<div class="shopifycraft-cd-unit"><span class="shopifycraft-cd-val">' + String(v).padStart(2,'0') + '</span><span class="shopifycraft-cd-lbl">' + l + '</span></div>';
+    }
+    el.innerHTML =
+      '<span class="shopifycraft-cd-label">Drops in</span>' +
+      u(d,'Days') + '<span class="shopifycraft-cd-sep">:</span>' +
+      u(h,'Hrs')  + '<span class="shopifycraft-cd-sep">:</span>' +
+      u(m,'Min')  + '<span class="shopifycraft-cd-sep">:</span>' +
+      u(s,'Sec');
+  }
+
+  function startCountdowns() {
+    timers.forEach(clearInterval);
+    timers = [];
+    root.querySelectorAll('[data-countdown]').forEach(function(el) {
+      var target = new Date(el.dataset.countdown).getTime();
+      tick(el, target);
+      timers.push(setInterval(function() { tick(el, target); }, 1000));
+    });
+  }
+
+  if (filters) {
+    filters.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-filter]');
+      if (!btn) return;
+      filters.querySelectorAll('[data-filter]').forEach(function(b) { b.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+      activeFilter = btn.dataset.filter;
+      applyFilter();
+    });
+  }
+
+  if (layouts) {
+    layouts.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-layout]');
+      if (!btn) return;
+      layouts.querySelectorAll('[data-layout]').forEach(function(b) { b.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+      root.classList.toggle('is-grid', btn.dataset.layout === 'grid');
+    });
+  }
+
+  applyFilter();
+  startCountdowns();
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Past Drops",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "Archive · All releases"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Past Drops"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Every release, archived. Nothing forgotten."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stats",
+      "label": "Show stats row",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Controls"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter",
+      "label": "Show filter bar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_layout_toggle",
+      "label": "Show layout toggle",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "default_layout",
+      "label": "Default layout",
+      "options": [
+        { "value": "timeline", "label": "Timeline" },
+        { "value": "grid", "label": "Grid" }
+      ],
+      "default": "timeline"
+    },
+    {
+      "type": "header",
+      "content": "Footer"
+    },
+    {
+      "type": "text",
+      "id": "footer_note",
+      "label": "Footer note",
+      "default": "Drops are final — no restocks, no exceptions."
+    },
+    {
+      "type": "header",
+      "content": "Fonts"
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Heading font",
+      "info": "Used for the title, drop names, and stats numbers",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "font_picker",
+      "id": "label_font",
+      "label": "Label font",
+      "info": "Used for badges, metadata, and buttons",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "header",
+      "content": "Colors & spacing"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 96
+    }
+  ],
+  "blocks": [
+    {
+      "type": "drop",
+      "name": "Drop",
+      "settings": [
+        {
+          "type": "text",
+          "id": "drop_number",
+          "label": "Drop number",
+          "default": "DROP 001"
+        },
+        {
+          "type": "text",
+          "id": "drop_name",
+          "label": "Drop name",
+          "default": "Collection Name"
+        },
+        {
+          "type": "text",
+          "id": "release_date",
+          "label": "Release date",
+          "info": "Format: YYYY-MM-DD — e.g. 2025-04-15",
+          "default": "2025-04-15"
+        },
+        {
+          "type": "select",
+          "id": "status",
+          "label": "Status",
+          "options": [
+            { "value": "sold",      "label": "Sold Out" },
+            { "value": "available", "label": "Available" },
+            { "value": "upcoming",  "label": "Upcoming" }
+          ],
+          "default": "sold"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection",
+          "info": "Products appear as thumbnails"
+        },
+        {
+          "type": "url",
+          "id": "cta_url",
+          "label": "CTA URL override",
+          "info": "Leave blank to use the collection URL"
+        },
+        {
+          "type": "url",
+          "id": "notify_url",
+          "label": "Notify Me URL",
+          "info": "For upcoming drops — links to a sign-up form"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Past Drops",
+      "blocks": [
+        {
+          "type": "drop",
+          "settings": {
+            "drop_number": "DROP 001",
+            "drop_name": "Origin",
+            "release_date": "2025-04-15",
+            "status": "sold"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
